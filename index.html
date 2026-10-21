@@ -1,0 +1,589 @@
+<title>Name on Smith Street</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alfa+Slab+One&family=Archivo+Black&family=Monoton&family=Oswald:wght@600&family=Pacifico&family=Ultra&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap">
+
+<script>
+/* ==========================================================================
+   YOUR MATERIAL — edit only this block.
+   --------------------------------------------------------------------------
+   1. SHOPS: one entry per storefront on Smith St.
+        id       short unique id you make up ("s01", "bakery"...)
+        name     shop name as written on the sign
+        number   house number (used to place it on the street plan)
+        side     "W" (west side) or "E" (east side) of Smith St
+        address  full address, used for the Google Maps link
+        maps     optional: paste a Google Maps share link to override
+        color    optional: main sign color, used for placeholder tiles
+   2. LETTERS: one key per letter. Each letter holds a list of photos.
+        img      path to the cropped letter photo, relative to this file,
+                 e.g. "letters/A/A_01.jpg"  (leave "" while you don't have it)
+        shop     the id of the shop it was cut from
+        note     optional: anything you noticed (faded, awning, neon...)
+   Suggested folder layout next to this HTML file:
+        letters/A/A_01.jpg, letters/A/A_02.jpg, letters/B/B_01.jpg ...
+   Addresses were looked up online on Oct 20, 2026; check them on your next
+   walk. side: even numbers are set to "W" (west, Court St side) and odd to
+   "E" (east, Hoyt St side). That is an assumption: if one shop proves it
+   wrong, flip all of them. Shops with number:null are not on the plan yet.
+   A shop on another street gets street:"Atlantic Ave" and stays off the plan.
+   ========================================================================== */
+const STREET = {
+  name: "Smith St",
+  area: "Brooklyn, NY",
+  numbersIncrease: "south"   // house numbers go up as you walk this way
+};
+
+const SHOPS = [
+  { id:"uppababy", name:"UPPAbaby", number:90, side:"W", address:"90 Smith St, Brooklyn, NY 11201", maps:"", color:"#858981" },   // UPPAbaby Brooklyn Hub; reported to move to 156 Montague St in 2027
+  { id:"nutsfactory", name:"Nuts Factory", number:100, side:"W", address:"100 Smith St, Brooklyn, NY 11201", maps:"", color:"#675d45" },
+  { id:"drmartens", name:"Dr. Martens", number:103, side:"E", address:"103 Smith St, Brooklyn, NY 11201", maps:"", color:"#d0d0a2" },
+  { id:"insomnia", name:"Insomnia Cookies", number:109, side:"E", address:"109 Smith St, Brooklyn, NY 11201", maps:"", color:"#9d9b98" },
+  { id:"freepeople", name:"Free People", number:113, side:"E", address:"113 Smith St, Brooklyn, NY 11201", maps:"", color:"#8b8382" },
+  { id:"gorjana", name:"gorjana", number:140, side:"W", address:"140 Smith St, Brooklyn, NY 11201", maps:"", color:"#99968f" },
+  { id:"xochitl", name:"Xochitl Taqueria", number:176, side:"W", address:"176 Smith St, Brooklyn, NY 11201", maps:"", color:"#949594" },
+  { id:"shan", name:"Shan", number:191, side:"E", address:"191 Smith St, Brooklyn, NY 11201", maps:"", color:"#9d978b" },
+  { id:"clover", name:"Clover Club", number:210, side:"W", address:"210 Smith St, Brooklyn, NY 11201", maps:"", color:"#748562" },
+  { id:"yerbabuena", name:"Yerba Buena", number:292, side:"", street:"Atlantic Ave", address:"292 Atlantic Ave, Brooklyn, NY 11201", maps:"", color:"#797c78" },   // not on Smith St
+  { id:"pacificdental", name:"Pacific Dental Care", number:105, side:"E", address:"105 Smith St, Brooklyn, NY 11201", maps:"", color:"#8c9998" },
+  { id:"malingoetz", name:"Malin+Goetz", number:131, side:"E", address:"131 Smith St, Brooklyn, NY 11201", maps:"", color:"#8d8f95" },
+  { id:"dastan", name:"Dastan", number:115, side:"E", address:"115 Smith St, Brooklyn, NY 11201", maps:"", color:"#7e805e" },
+  { id:"mokafe", name:"Mokafé", number:110, side:"W", address:"110 Smith St, Brooklyn, NY 11201", maps:"", color:"#7e8b60" },
+  { id:"mystic", name:"Mystic Essence", number:125, side:"E", address:"125 Smith St, Brooklyn, NY 11201", maps:"", color:"#dddfd3" },
+  { id:"beautystudio", name:"Rose Beauty Studio and Salon", number:99, side:"E", address:"99 Smith St, Brooklyn, NY 11201", maps:"", color:"#a0908f" },
+  { id:"yummypicks", name:"Yummy Picks Deli", number:101, side:"E", address:"101 Smith St, Brooklyn, NY 11201", maps:"", color:"#89876f" },
+  { id:"lawoffices", name:"Law Offices", number:107, side:"E", address:"107 Smith St, Brooklyn, NY 11201", maps:"", color:"#b7baba" },
+  { id:"juju", name:"JuJu", number:143, side:"E", address:"143 Smith St, Brooklyn, NY 11201", maps:"", color:"#60829a" },
+];
+
+const LETTERS = {
+  "A": [
+    { img:"letters/A/A_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/A/A_dastan_01.png", shop:"dastan", note:"" },
+    { img:"letters/A/A_dastan_02.png", shop:"dastan", note:"" },
+    { img:"letters/A/A_drmartens_01.png", shop:"drmartens", note:"lowercase" },
+    { img:"letters/A/A_gorjana_01.png", shop:"gorjana", note:"lowercase" },
+    { img:"letters/A/A_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/A/A_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/A/A_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/A/A_mokafe_01.png", shop:"mokafe", note:"" },
+    { img:"letters/A/A_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/A/A_pacificdental_01.png", shop:"pacificdental", note:"check: letter or shop unsure, probably Pacific Dental Care, check" },
+    { img:"letters/A/A_pacificdental_02.png", shop:"pacificdental", note:"" },
+    { img:"letters/A/A_pacificdental_03.png", shop:"pacificdental", note:"" },
+    { img:"letters/A/A_shan_01.png", shop:"shan", note:"" },
+    { img:"letters/A/A_uppababy_01.png", shop:"uppababy", note:"" },
+    { img:"letters/A/A_uppababy_02.png", shop:"uppababy", note:"lowercase" },
+    { img:"letters/A/A_xochitl_01.png", shop:"xochitl", note:"" },
+    { img:"letters/A/A_xochitl_02.png", shop:"xochitl", note:"" },
+    { img:"letters/A/A_yerbabuena_01.png", shop:"yerbabuena", note:"lowercase" },
+  ],
+  "B": [
+    { img:"letters/B/B_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/B/B_uppababy_01.png", shop:"uppababy", note:"lowercase" },
+    { img:"letters/B/B_uppababy_02.png", shop:"uppababy", note:"lowercase" },
+    { img:"letters/B/B_yerbabuena_01.png", shop:"yerbabuena", note:"" },
+    { img:"letters/B/B_yerbabuena_02.png", shop:"yerbabuena", note:"lowercase" },
+  ],
+  "C": [
+    { img:"letters/C/C_clover_01.png", shop:"clover", note:"" },
+    { img:"letters/C/C_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/C/C_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/C/C_mystic_01.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/C/C_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/C/C_pacificdental_01.png", shop:"pacificdental", note:"" },
+    { img:"letters/C/C_pacificdental_02.png", shop:"pacificdental", note:"" },
+    { img:"letters/C/C_pacificdental_03.png", shop:"pacificdental", note:"" },
+    { img:"letters/C/C_xochitl_01.png", shop:"xochitl", note:"" },
+    { img:"letters/C/C_yummypicks_01.png", shop:"yummypicks", note:"lowercase" },
+  ],
+  "D": [
+    { img:"letters/D/D_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/D/D_dastan_01.png", shop:"dastan", note:"" },
+    { img:"letters/D/D_drmartens_01.png", shop:"drmartens", note:"" },
+    { img:"letters/D/D_pacificdental_01.png", shop:"pacificdental", note:"" },
+  ],
+  "E": [
+    { img:"letters/E/E_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/E/E_clover_01.png", shop:"clover", note:"" },
+    { img:"letters/E/E_drmartens_01.png", shop:"drmartens", note:"lowercase" },
+    { img:"letters/E/E_freepeople_01.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/E/E_freepeople_02.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/E/E_freepeople_03.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/E/E_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/E/E_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/E/E_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/E/E_mokafe_01.png", shop:"mokafe", note:"É with accent" },
+    { img:"letters/E/E_mystic_01.png", shop:"mystic", note:"" },
+    { img:"letters/E/E_mystic_02.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/E/E_pacificdental_01.png", shop:"pacificdental", note:"" },
+    { img:"letters/E/E_pacificdental_02.png", shop:"pacificdental", note:"" },
+    { img:"letters/E/E_xochitl_01.png", shop:"xochitl", note:"" },
+    { img:"letters/E/E_yerbabuena_01.png", shop:"yerbabuena", note:"lowercase" },
+  ],
+  "F": [
+    { img:"letters/F/F_freepeople_01.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/F/F_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/F/F_mokafe_01.png", shop:"mokafe", note:"" },
+    { img:"letters/F/F_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/F/F_pacificdental_01.png", shop:"pacificdental", note:"" },
+  ],
+  "G": [
+    { img:"letters/G/G_gorjana_01.png", shop:"gorjana", note:"lowercase" },
+    { img:"letters/G/G_malingoetz_01.png", shop:"malingoetz", note:"" },
+  ],
+  "H": [
+    { img:"letters/H/H_shan_01.png", shop:"shan", note:"" },
+    { img:"letters/H/H_xochitl_01.png", shop:"xochitl", note:"" },
+  ],
+  "I": [
+    { img:"letters/I/I_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/I/I_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/I/I_insomnia_02.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/I/I_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/I/I_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/I/I_mystic_01.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/I/I_pacificdental_01.png", shop:"pacificdental", note:"" },
+    { img:"letters/I/I_xochitl_01.png", shop:"xochitl", note:"" },
+    { img:"letters/I/I_xochitl_02.png", shop:"xochitl", note:"" },
+    { img:"letters/I/I_yummypicks_01.png", shop:"yummypicks", note:"lowercase" },
+  ],
+  "J": [
+    { img:"letters/J/J_gorjana_01.png", shop:"gorjana", note:"lowercase" },
+    { img:"letters/J/J_juju_01.png", shop:"juju", note:"" },
+  ],
+  "K": [
+    { img:"letters/K/K_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/K/K_mokafe_01.png", shop:"mokafe", note:"" },
+    { img:"letters/K/K_yummypicks_01.png", shop:"yummypicks", note:"lowercase" },
+  ],
+  "L": [
+    { img:"letters/L/L_clover_01.png", shop:"clover", note:"" },
+    { img:"letters/L/L_freepeople_01.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/L/L_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/L/L_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/L/L_pacificdental_01.png", shop:"pacificdental", note:"check: letter or shop unsure" },
+    { img:"letters/L/L_xochitl_01.png", shop:"xochitl", note:"" },
+  ],
+  "M": [
+    { img:"letters/M/M_drmartens_01.png", shop:"drmartens", note:"" },
+    { img:"letters/M/M_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/M/M_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/M/M_mokafe_01.png", shop:"mokafe", note:"" },
+    { img:"letters/M/M_mystic_01.png", shop:"mystic", note:"" },
+    { img:"letters/M/M_yummypicks_01.png", shop:"yummypicks", note:"lowercase" },
+    { img:"letters/M/M_yummypicks_02.png", shop:"yummypicks", note:"lowercase" },
+  ],
+  "N": [
+    { img:"letters/N/N_dastan_01.png", shop:"dastan", note:"" },
+    { img:"letters/N/N_drmartens_01.png", shop:"drmartens", note:"lowercase" },
+    { img:"letters/N/N_gorjana_01.png", shop:"gorjana", note:"lowercase" },
+    { img:"letters/N/N_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/N/N_insomnia_02.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/N/N_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/N/N_mystic_01.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/N/N_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/N/N_pacificdental_01.png", shop:"pacificdental", note:"" },
+    { img:"letters/N/N_shan_01.png", shop:"shan", note:"" },
+    { img:"letters/N/N_yerbabuena_01.png", shop:"yerbabuena", note:"lowercase, check: letter or shop unsure" },
+  ],
+  "O": [
+    { img:"letters/O/O_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/O/O_beautystudio_02.png", shop:"beautystudio", note:"check: letter or shop unsure" },
+    { img:"letters/O/O_clover_01.png", shop:"clover", note:"" },
+    { img:"letters/O/O_freepeople_01.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/O/O_gorjana_01.png", shop:"gorjana", note:"lowercase" },
+    { img:"letters/O/O_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/O/O_insomnia_02.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/O/O_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/O/O_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/O/O_mokafe_01.png", shop:"mokafe", note:"" },
+    { img:"letters/O/O_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/O/O_xochitl_01.png", shop:"xochitl", note:"" },
+  ],
+  "P": [
+    { img:"letters/P/P_freepeople_01.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/P/P_uppababy_01.png", shop:"uppababy", note:"" },
+    { img:"letters/P/P_uppababy_02.png", shop:"uppababy", note:"" },
+    { img:"letters/P/P_yummypicks_01.png", shop:"yummypicks", note:"" },
+  ],
+  "Q": [
+    { img:"letters/Q/Q_xochitl_01.png", shop:"xochitl", note:"" },
+  ],
+  "R": [
+    { img:"letters/R/R_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/R/R_clover_01.png", shop:"clover", note:"" },
+    { img:"letters/R/R_drmartens_01.png", shop:"drmartens", note:"lowercase" },
+    { img:"letters/R/R_drmartens_02.png", shop:"drmartens", note:"lowercase" },
+    { img:"letters/R/R_freepeople_01.png", shop:"freepeople", note:"lowercase" },
+    { img:"letters/R/R_gorjana_01.png", shop:"gorjana", note:"lowercase" },
+    { img:"letters/R/R_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/R/R_pacificdental_01.png", shop:"pacificdental", note:"" },
+    { img:"letters/R/R_xochitl_01.png", shop:"xochitl", note:"" },
+    { img:"letters/R/R_yerbabuena_01.png", shop:"yerbabuena", note:"lowercase" },
+  ],
+  "S": [
+    { img:"letters/S/S_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/S/S_beautystudio_02.png", shop:"beautystudio", note:"" },
+    { img:"letters/S/S_dastan_01.png", shop:"dastan", note:"" },
+    { img:"letters/S/S_drmartens_01.png", shop:"drmartens", note:"lowercase" },
+    { img:"letters/S/S_insomnia_01.png", shop:"insomnia", note:"lowercase" },
+    { img:"letters/S/S_lawoffices_01.png", shop:"lawoffices", note:"" },
+    { img:"letters/S/S_mystic_01.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/S/S_mystic_02.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/S/S_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/S/S_shan_01.png", shop:"shan", note:"" },
+    { img:"letters/S/S_yummypicks_01.png", shop:"yummypicks", note:"lowercase" },
+  ],
+  "T": [
+    { img:"letters/T/T_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/T/T_beautystudio_02.png", shop:"beautystudio", note:"" },
+    { img:"letters/T/T_dastan_01.png", shop:"dastan", note:"" },
+    { img:"letters/T/T_drmartens_01.png", shop:"drmartens", note:"lowercase" },
+    { img:"letters/T/T_malingoetz_01.png", shop:"malingoetz", note:"" },
+    { img:"letters/T/T_mystic_01.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/T/T_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/T/T_nutsfactory_02.png", shop:"nutsfactory", note:"" },
+    { img:"letters/T/T_pacificdental_01.png", shop:"pacificdental", note:"check: letter or shop unsure, probably Pacific Dental Care, check" },
+    { img:"letters/T/T_xochitl_01.png", shop:"xochitl", note:"" },
+    { img:"letters/T/T_xochitl_02.png", shop:"xochitl", note:"" },
+  ],
+  "U": [
+    { img:"letters/U/U_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/U/U_beautystudio_02.png", shop:"beautystudio", note:"" },
+    { img:"letters/U/U_juju_01.png", shop:"juju", note:"lowercase" },
+    { img:"letters/U/U_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/U/U_uppababy_01.png", shop:"uppababy", note:"check: letter or shop unsure" },
+    { img:"letters/U/U_xochitl_01.png", shop:"xochitl", note:"" },
+    { img:"letters/U/U_yerbabuena_01.png", shop:"yerbabuena", note:"lowercase" },
+    { img:"letters/U/U_yummypicks_01.png", shop:"yummypicks", note:"lowercase" },
+  ],
+  "V": [
+    { img:"letters/V/V_clover_01.png", shop:"clover", note:"" },
+  ],
+  "W": [
+    { img:"letters/W/W_lawoffices_01.png", shop:"lawoffices", note:"" },
+  ],
+  "X": [
+    { img:"letters/X/X_xochitl_01.png", shop:"xochitl", note:"" },
+  ],
+  "Y": [
+    { img:"letters/Y/Y_beautystudio_01.png", shop:"beautystudio", note:"" },
+    { img:"letters/Y/Y_mystic_01.png", shop:"mystic", note:"lowercase" },
+    { img:"letters/Y/Y_nutsfactory_01.png", shop:"nutsfactory", note:"" },
+    { img:"letters/Y/Y_uppababy_01.png", shop:"uppababy", note:"lowercase" },
+    { img:"letters/Y/Y_yerbabuena_01.png", shop:"yerbabuena", note:"lowercase, check: letter or shop unsure" },
+    { img:"letters/Y/Y_yummypicks_01.png", shop:"yummypicks", note:"" },
+    { img:"letters/Y/Y_yummypicks_02.png", shop:"yummypicks", note:"lowercase" },
+  ],
+  "Z": [
+    { img:"letters/Z/Z_malingoetz_01.png", shop:"malingoetz", note:"" },
+  ],
+};
+
+const DEFAULT_WORD = "SMITH ST";
+/* ======================= end of your material =========================== */
+</script>
+
+<style>
+/* Layout: one working column — word input, the collage, then the street plan beside the detail card, then the full alphabet archive. */
+:root{
+  --ground:#e9ebe8; --panel:#f6f7f5; --ink:#16191a; --muted:#5d6563; --line:#c9cecb;
+  --asphalt:#3a3f3e; --curb:#d9ddd9; --route:#e0a400; --pick:#0b6e8a;
+  --f-display:"Archivo Black","Arial Black",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --tile:clamp(52px,10vw,104px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#121514;--panel:#1a1e1d;--ink:#e6e9e6;--muted:#9aa29f;--line:#2f3533;
+  --asphalt:#262a29;--curb:#3a403e;--route:#f2bd1f;--pick:#4fb6d4;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#121514;--panel:#1a1e1d;--ink:#e6e9e6;--muted:#9aa29f;--line:#2f3533;
+  --asphalt:#262a29;--curb:#3a403e;--route:#f2bd1f;--pick:#4fb6d4;color-scheme:dark}
+
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding-block:28px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:grid;gap:28px}
+header{display:grid;gap:8px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,6vw,52px);line-height:1.02;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:0;max-width:62ch;color:var(--muted)}
+.note{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+
+.controls{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:end}
+.field{display:grid;gap:4px;min-width:0}
+.field label,.label{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+input[type=text]{font:400 20px var(--f-display);letter-spacing:.04em;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 11px;width:min(320px,80vw)}
+button{font:600 14px var(--f-body);color:var(--ground);background:var(--ink);border:0;border-radius:6px;padding:10px 14px;cursor:pointer}
+button:focus-visible,input:focus-visible,.tile:focus-visible,.shop:focus-visible,.key:focus-visible,.card-btn:focus-visible{outline:3px solid var(--pick);outline-offset:2px}
+
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:clamp(18px,4vw,36px);min-height:calc(var(--tile) + 72px);
+  display:flex;flex-wrap:wrap;gap:10px 8px;align-items:center;justify-content:center}
+.gap{width:calc(var(--tile)*.4)}
+.tile{position:relative;height:var(--tile);min-width:calc(var(--tile)*.62);padding:0 .14em;display:grid;place-items:center;
+  font-size:calc(var(--tile)*.7);line-height:1;border:0;border-radius:2px;cursor:pointer;overflow:hidden;
+  transform:rotate(var(--rot,0deg));transition:transform .15s;box-shadow:0 1px 0 rgba(0,0,0,.18),0 3px 8px rgba(0,0,0,.12)}
+.tile:hover{transform:rotate(0deg) translateY(-3px)}
+.tile.on{outline:3px solid var(--pick);outline-offset:3px;transform:rotate(0deg)}
+.tile .stop{position:absolute;top:3px;left:4px;font:500 10px var(--f-mono);opacity:.8;background:rgba(0,0,0,.35);color:#fff;border-radius:3px;padding:0 3px}
+.tile.photo{background:#fff;padding:0}
+.tile.photo img{height:100%;width:auto;max-width:none;display:block}
+.tile.missing{background:transparent;border:2px dashed var(--line);box-shadow:none;color:var(--muted);font:400 calc(var(--tile)*.45) var(--f-mono);cursor:default}
+.ph::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.22;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 .96  0 0 0 -1.6 1.05'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:12px;min-width:0}
+.card h2{font:600 13px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;margin:0;color:var(--muted)}
+
+.map{overflow-x:auto}
+.map svg{display:block;min-width:640px;width:100%;height:auto}
+.street{fill:var(--asphalt)} .curb{fill:var(--curb)}
+.lane{stroke:var(--route);stroke-width:2;stroke-dasharray:14 12;opacity:.5}
+.shop rect{fill:var(--panel);stroke:var(--line);stroke-width:1.5}
+.shop text{font:500 10px var(--f-mono);fill:var(--muted)}
+.shop{cursor:pointer}
+.shop.used rect{stroke:var(--route);stroke-width:3}
+.shop.cur rect{stroke:var(--pick);stroke-width:4}
+.route{fill:none;stroke:var(--route);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.stopdot{fill:var(--route)} .stoptxt{font:500 10px var(--f-mono);fill:#16191a;text-anchor:middle;dominant-baseline:central}
+.compass{font:500 11px var(--f-mono);fill:var(--muted)}
+.sidelbl{font:600 11px var(--f-mono);fill:var(--muted);letter-spacing:.08em}
+
+.big{display:flex;gap:14px;align-items:center}
+.big .tile{--tile:88px;cursor:default}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;margin:0}
+.kv dt{font:500 11px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-top:2px}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.dir{background:var(--ground);border-radius:8px;padding:10px 12px;font-size:14px}
+.variants{display:flex;flex-wrap:wrap;gap:12px}
+.variants .tile{--tile:72px;transform:none}
+a{color:var(--pick)}
+.muted{color:var(--muted)}
+
+.keys{display:flex;flex-wrap:wrap;gap:6px}
+.key{font:400 18px var(--f-display);width:46px;height:52px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  display:grid;place-items:center;padding:0;cursor:pointer;line-height:1}
+.key small{font:500 10px var(--f-mono);color:var(--muted)}
+.key.empty{opacity:.4}
+.key.sel{background:var(--ink);color:var(--ground)} .key.sel small{color:var(--ground)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.card-btn{display:grid;gap:6px;text-align:left;background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:10px;cursor:pointer;color:var(--ink);font:400 13px var(--f-body)}
+.card-btn .tile{--tile:72px;transform:none;justify-self:start}
+.card-btn .sub{font:400 11px var(--f-mono);color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.tile{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Name on Smith Street</h1>
+    <p class="lede">Type a word. Every letter is cut from a shop sign on Smith Street in Brooklyn, so the word becomes a walk up and down the block. Tap a letter to see which storefront it came from, how to get there, and the other versions of that letter on the street.</p>
+    <span class="note" id="status"></span>
+  </header>
+
+  <div class="controls">
+    <div class="field"><label for="word">Your word</label>
+      <input id="word" type="text" maxlength="18" autocomplete="off" spellcheck="false"></div>
+    <button id="shuffle" type="button">Shuffle letters</button>
+  </div>
+
+  <section class="stage" id="stage" aria-label="Your word, assembled from Smith Street signs"></section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>The walk</h2>
+      <div class="map" id="map"></div>
+      <span class="note" id="walkSum"></span>
+    </section>
+    <section class="card" id="detail" aria-live="polite"></section>
+  </div>
+
+  <section class="card">
+    <h2>The Smith Street alphabet</h2>
+    <div class="keys" id="keys"></div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+</div>
+
+<script>
+const FONTS=['"Archivo Black",sans-serif','"Abril Fatface",serif','"Alfa Slab One",serif','"Oswald",sans-serif','"Pacifico",cursive','"Ultra",serif','"Monoton",sans-serif'];
+const shopById=Object.fromEntries(SHOPS.map(s=>[s.id,s]));
+const ALPHA=[..."ABCDEFGHIJKLMNOPQRSTUVWXYZ",...Object.keys(LETTERS).filter(k=>!/^[A-Z]$/.test(k))];
+const $=id=>document.getElementById(id);
+const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=c=>/[a-z]/i.test(c)?c.toUpperCase():c;
+const S=STREET.numbersIncrease==="south"?{up:"south",down:"north"}:{up:"north",down:"south"};
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hash(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)}
+function ink(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||"");if(!m)return"#fff";const n=parseInt(m[1],16),l=(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255;return l>.6?"#141414":"#ffffff"}
+const placed=s=>s&&s.number!=null&&(s.side==="W"||s.side==="E")&&(!s.street||s.street===STREET.name);
+function mapsUrl(sh){return sh.maps||("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(sh.address||(placed(sh)?`${sh.number} ${STREET.name}, ${STREET.area}`:`${sh.name}, ${STREET.name}, ${STREET.area}`)))}
+
+let seed=11,picks=[],sel=null,browseKey=null;   // sel = {ch,i,w}  (w = index in word or null)
+
+function assemble(){
+  const r=rng(seed),used=new Set();
+  picks=[...$("word").value].map(c=>{
+    if(!c.trim())return{gap:true};
+    const ch=norm(c),list=LETTERS[ch]||[];
+    if(!list.length)return{missing:true,ch:c};
+    const idx=list.map((e,i)=>i),fresh=idx.filter(i=>!used.has(list[i].shop)),from=fresh.length?fresh:idx;
+    const i=from[Math.floor(r()*from.length)];used.add(list[i].shop);
+    return{ch,i,rot:(r()*8-4).toFixed(1)};
+  });
+  const f=picks.findIndex(p=>p.ch&&!p.missing);
+  sel=f>=0?{ch:picks[f].ch,i:picks[f].i,w:f}:null;
+  render();
+}
+const stops=()=>picks.map((p,i)=>p.ch&&!p.missing?i:-1).filter(i=>i>=0);
+const entry=(ch,i)=>LETTERS[ch][i];
+
+function tile(ch,i,{tag="div",rot=0}={}){
+  const e=entry(ch,i),sh=shopById[e.shop]||{color:"#444"},el=document.createElement(tag);
+  el.className="tile";el.style.setProperty("--rot",rot+"deg");
+  const fallback=()=>{el.classList.remove("photo");el.classList.add("ph");el.innerHTML="";
+    el.style.background=sh.color||"#444";el.style.color=ink(sh.color);
+    el.style.fontFamily=FONTS[hash(e.shop+ch+i)%FONTS.length];el.textContent=ch};
+  if(e.img){el.classList.add("photo");const im=new Image();im.alt=`${ch} from ${sh.name||"a shop"}`;im.onerror=fallback;im.src=e.img;el.appendChild(im)}
+  else fallback();
+  return el;
+}
+
+function render(){
+  const st=$("stage");st.innerHTML="";const sp=stops();
+  picks.forEach((p,w)=>{
+    if(p.gap){const g=document.createElement("span");g.className="gap";st.appendChild(g);return}
+    if(p.missing){const m=document.createElement("div");m.className="tile missing";m.textContent="?";m.title=`No "${p.ch}" collected on ${STREET.name} yet`;st.appendChild(m);return}
+    const el=tile(p.ch,p.i,{tag:"button",rot:p.rot});el.type="button";
+    const n=sp.indexOf(w),sh=shopById[entry(p.ch,p.i).shop];
+    const b=document.createElement("span");b.className="stop";b.textContent=n+1;el.appendChild(b);
+    el.setAttribute("aria-label",`Letter ${p.ch} from ${sh?sh.name:"unknown shop"}, stop ${n+1}`);
+    if(sel&&sel.w===w)el.classList.add("on");
+    el.onclick=()=>{sel={ch:p.ch,i:p.i,w};render()};
+    st.appendChild(el);
+  });
+  if(!picks.length)st.innerHTML='<span class="muted">Type a word above.</span>';
+  drawMap();drawDetail();drawKeys();
+}
+
+function drawMap(){
+  const P=SHOPS.filter(placed),unplacedN=SHOPS.length-P.length;
+  if(!P.length){$("map").innerHTML=`<p class="muted" style="margin:0">Add house numbers and sides to SHOPS to draw the street plan and the route. Every letter already links to Google Maps.</p>`;$("walkSum").textContent=`${SHOPS.length} storefronts not placed yet.`;return}
+  const nums=P.map(s=>s.number),lo=Math.min(...nums),hi=Math.max(...nums),W=900,pad=60;
+  const X=n=>hi===lo?W/2:pad+(n-lo)/(hi-lo)*(W-pad*2);
+  // the lower numbers sit on the left; label which compass end that is
+  const leftEnd=S.down.toUpperCase(),rightEnd=S.up.toUpperCase();
+  let h=`<svg viewBox="0 0 ${W} 280" role="img" aria-label="Plan of ${esc(STREET.name)} with your route">`;
+  h+=`<rect class="curb" x="0" y="108" width="${W}" height="64"/><rect class="street" x="0" y="118" width="${W}" height="44"/>`;
+  h+=`<line class="lane" x1="0" y1="140" x2="${W}" y2="140"/>`;
+  h+=`<text class="sidelbl" x="8" y="16">WEST SIDE</text><text class="sidelbl" x="8" y="270">EAST SIDE</text>`;
+  h+=`<text class="compass" x="${W-8}" y="270" text-anchor="end">${rightEnd} · higher numbers →</text>`;
+  h+=`<text class="compass" x="${W-8}" y="16" text-anchor="end">← ${leftEnd}</text>`;
+  const sp=stops(),used=new Set(sp.map(w=>entry(picks[w].ch,picks[w].i).shop));
+  const curId=sel?entry(sel.ch,sel.i).shop:null;
+  P.forEach(s=>{
+    const x=X(s.number)-26,y=s.side==="W"?30:182;
+    h+=`<g class="shop${used.has(s.id)?" used":""}${s.id===curId?" cur":""}" data-id="${s.id}" tabindex="0" role="button" aria-label="${esc(s.name)}, ${s.number} ${esc(STREET.name)}">`+
+       `<rect x="${x}" y="${y}" width="52" height="68" rx="3"/><rect x="${x+5}" y="${s.side==="W"?y+48:y+5}" width="42" height="14" rx="2" fill="${s.color||"#888"}"/>`+
+       `<text x="${x+26}" y="${s.side==="W"?y+28:y+44}" text-anchor="middle">${s.number}</text></g>`;
+  });
+  const door=s=>[X(s.number),s.side==="W"?112:168];
+  const spP=sp.filter(w=>placed(shopById[entry(picks[w].ch,picks[w].i).shop]));
+  const pts=spP.map(w=>door(shopById[entry(picks[w].ch,picks[w].i).shop]));
+  if(pts.length>1)h+=`<polyline class="route" points="${pts.map(p=>p.join(",")).join(" ")}"/>`;
+  const seen={};
+  sp.forEach((w,n)=>{const id=entry(picks[w].ch,picks[w].i).shop,s=shopById[id];if(!placed(s))return;const [x,y]=door(s),k=seen[id]=(seen[id]||0)+1;
+    h+=`<circle class="stopdot" cx="${x+(k-1)*14}" cy="${y}" r="9"/><text class="stoptxt" x="${x+(k-1)*14}" y="${y}">${n+1}</text>`});
+  $("map").innerHTML=h+"</svg>";
+  $("map").querySelectorAll(".shop").forEach(g=>{
+    const go=()=>showShop(g.dataset.id);
+    g.onclick=go;g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}};
+  });
+  const shopsOnRoute=spP.map(w=>shopById[entry(picks[w].ch,picks[w].i).shop]);
+  const span=shopsOnRoute.slice(1).reduce((a,s,n)=>a+Math.abs(s.number-shopsOnRoute[n].number),0);
+  const cross=shopsOnRoute.slice(1).filter((s,n)=>s.side!==shopsOnRoute[n].side).length;
+  const miss=picks.filter(p=>p.missing).map(p=>p.ch);
+  $("walkSum").textContent=sp.length?`${sp.length} stops · ${cross} crossing${cross===1?"":"s"} · you cover ${span} house numbers in total`+(miss.length?` · not collected yet: ${[...new Set(miss)].join(" ")}`:"")+(unplacedN?` · ${unplacedN} storefronts not on the plan yet`:""):"No letters placed yet.";
+}
+
+function directions(w){
+  const sp=stops(),n=sp.indexOf(w);
+  if(n<=0)return"Start here. This is the first letter of your word.";
+  const a=shopById[entry(picks[sp[n-1]].ch,picks[sp[n-1]].i).shop],b=shopById[entry(picks[w].ch,picks[w].i).shop];
+  if(!a||!b)return"";
+  if(a.id!==b.id&&(!placed(a)||!placed(b)))return b.street&&b.street!==STREET.name?`${b.name} is on ${b.street}, not on ${STREET.name}. Use the Google Maps link.`:`Go to ${b.name}. Its spot on ${STREET.name} isn't set yet, so use the Google Maps link.`;
+  if(a.id===b.id)return"Same storefront as the last letter. Look along the sign for this one.";
+  let t="";
+  if(a.side!==b.side)t+=`Cross to the ${b.side==="W"?"west":"east"} side`;
+  if(a.number!==b.number){const dir=b.number>a.number?S.up:S.down;t+=(t?", then walk ":"Walk ")+`${dir} to No. ${b.number}.`}
+  else t="It's directly across the street.";
+  return t;
+}
+
+function shopBlock(sh){
+  return`<dl class="kv"><dt>Shop</dt><dd>${esc(sh.name)}</dd><dt>Address</dt><dd>${esc(sh.address||(placed(sh)?`${sh.number} ${STREET.name}`:`${STREET.name}, ${STREET.area} (number not set yet)`))}</dd>`+
+    (placed(sh)?`<dt>Side</dt><dd>${sh.side==="W"?"West":"East"} side of ${esc(STREET.name)}</dd>`:"")+`</dl>`+
+    `<div><a href="${esc(mapsUrl(sh))}" target="_blank" rel="noopener">Open in Google Maps ↗</a></div>`;
+}
+
+function drawDetail(){
+  const d=$("detail");
+  if(!sel){d.innerHTML=`<h2>Letter</h2><p class="muted" style="margin:0">Tap a letter in your word, a storefront on the plan, or a photo in the alphabet below.</p>`;return}
+  const e=entry(sel.ch,sel.i),sh=shopById[e.shop]||{name:"Unknown shop (check the id)",number:"?",side:"W"};
+  const inWord=sel.w!=null;
+  d.innerHTML=`<h2>${inWord?`Stop ${stops().indexOf(sel.w)+1} · `:""}Letter “${esc(sel.ch)}”</h2>`;
+  const big=document.createElement("div");big.className="big";big.appendChild(tile(sel.ch,sel.i));
+  const cap=document.createElement("div");
+  cap.innerHTML=`<div style="font-weight:600">${esc(sh.name)}</div><div class="muted">${sh.number!=null?"No. "+esc(sh.number)+(sh.street&&sh.street!==STREET.name?" "+esc(sh.street):"")+" · ":""}photo ${sel.i+1} of ${LETTERS[sel.ch].length}</div>`+(e.note?`<div class="muted">${esc(e.note)}</div>`:"");
+  big.appendChild(cap);d.appendChild(big);
+  d.insertAdjacentHTML("beforeend",shopBlock(sh));
+  const list=LETTERS[sel.ch];
+  if(list.length>1){
+    d.insertAdjacentHTML("beforeend",`<div class="label">${inWord?"Swap for another":"Other"} “${esc(sel.ch)}” on ${esc(STREET.name)}</div>`);
+    const v=document.createElement("div");v.className="variants";
+    list.forEach((x,i)=>{if(i===sel.i)return;const b=tile(sel.ch,i,{tag:"button"});b.type="button";
+      b.setAttribute("aria-label",`${sel.ch} from ${(shopById[x.shop]||{}).name||"unknown"}`);
+      b.onclick=()=>{if(inWord){picks[sel.w].i=i;sel={...sel,i}}else sel={ch:sel.ch,i,w:null};render()};v.appendChild(b)});
+    d.appendChild(v);
+  }
+}
+
+function showShop(id){
+  const sh=shopById[id],d=$("detail");if(!sh)return;
+  const found=[];Object.entries(LETTERS).forEach(([ch,l])=>l.forEach((e,i)=>{if(e.shop===id)found.push([ch,i])}));
+  sel=null;render();
+  d.innerHTML=`<h2>Storefront${placed(sh)?" · No. "+esc(sh.number):""}</h2>`+shopBlock(sh)+`<div class="label">Letters collected here (${found.length})</div>`;
+  const v=document.createElement("div");v.className="variants";
+  found.forEach(([ch,i])=>{const b=tile(ch,i,{tag:"button"});b.type="button";b.onclick=()=>{sel={ch,i,w:null};render()};v.appendChild(b)});
+  d.appendChild(v);
+  $("map").querySelectorAll(".shop").forEach(g=>g.classList.toggle("cur",g.dataset.id===id));
+}
+
+function drawKeys(){
+  const k=$("keys");k.innerHTML="";
+  ALPHA.forEach(ch=>{const n=(LETTERS[ch]||[]).length,b=document.createElement("button");
+    b.type="button";b.className="key"+(n?"":" empty")+(ch===browseKey?" sel":"");
+    b.innerHTML=`<span>${esc(ch)}</span><small>${n}</small>`;b.setAttribute("aria-label",`${ch}, ${n} photos`);
+    b.onclick=()=>{browseKey=ch;drawKeys()};k.appendChild(b)});
+  const g=$("gallery");g.innerHTML="";
+  if(!browseKey){g.innerHTML='<span class="muted">Pick a letter to see every version collected on the street.</span>';return}
+  const list=LETTERS[browseKey]||[];
+  if(!list.length){g.innerHTML=`<span class="muted">No “${esc(browseKey)}” collected yet.</span>`;return}
+  list.forEach((e,i)=>{const sh=shopById[e.shop]||{name:"Unknown shop",number:"?"};
+    const c=document.createElement("button");c.type="button";c.className="card-btn";
+    c.appendChild(tile(browseKey,i));
+    c.insertAdjacentHTML("beforeend",`<span>${esc(sh.name)}</span><span class="sub">${placed(sh)?"No. "+esc(sh.number)+" · "+(sh.side==="W"?"west":"east"):(sh.street&&sh.street!==STREET.name?esc(sh.street):"not placed yet")}${e.note?" · "+esc(e.note):""}</span>`);
+    c.onclick=()=>{sel={ch:browseKey,i,w:null};render();$("detail").scrollIntoView({behavior:"smooth",block:"nearest"})};
+    g.appendChild(c)});
+}
+
+const total=Object.values(LETTERS).reduce((a,l)=>a+l.length,0),withImg=Object.values(LETTERS).reduce((a,l)=>a+l.filter(e=>e.img).length,0);
+$("status").textContent=`${STREET.name}, ${STREET.area} · ${SHOPS.length} storefronts · ${total} letters (${withImg} with photos${withImg<total?"; the rest show placeholders":""})`;
+$("word").value=DEFAULT_WORD;
+$("word").oninput=assemble;
+$("shuffle").onclick=()=>{seed=(seed*7919+13)%100000;assemble()};
+assemble();
+</script>
